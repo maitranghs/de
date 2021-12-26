@@ -42,9 +42,3 @@ exports.findByLocationAndTime = (rp, etf, ett) => {
         "$gte": new Date(etf), 
         "$lt": new Date(ett)}}).exec();
 }
-
-// return EpcisEvent.find({
-//   read_point: "urn:epc:id:sgln:545335.948414.17", 
-//   event_time: {
-//     "$gte": new Date("2021-12-24T14:09:11.420Z"), 
-//     "$lt": new Date("2021-12-24T14:09:13.420Z")}}).exec();

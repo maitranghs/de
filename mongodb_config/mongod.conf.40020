@@ -1,0 +1,9 @@
+storage:
+  dbPath: /Users/trangbui/Documents/BK-Master-Degree/Coding/ws/mongodb_shard/data/mongod.data.40020
+sharding:
+  clusterRole: shardsvr
+replication:
+  replSetName: rs2
+net:
+  bindIp: 127.0.0.1
+  port: 40020

@@ -1,0 +1,54 @@
+# Navigate to place where you want to save data
+# Create folders
+mkdir data
+cd data/
+mkdir mongod.data.40000 mongod.data.40010 mongod.data.40020
+mkdir mongoc.data.30010
+# Confis files
+mkdir ../configs
+cd ../configs/
+touch mongod.conf.40000 mongod.conf.40010 mongod.conf.40020
+touch mongoc.conf.30010
+touch mongos.conf.50000
+# Run 3 shard' servers
+mongod --config configs/mongod.conf.40000
+mongod --config configs/mongod.conf.40010
+mongod --config configs/mongod.conf.40020
+# Log to mongo shell of each shard to set up replica set (1 primary node for replica set)
+# Shard 1
+mongo --port 40000
+rs.initiate({ _id: "rs0", members: [ { _id: 0, host: "localhost:40000" }]})
+# Shard 2
+mongo --port 40010
+rs.initiate({ _id: "rs1", members: [ { _id: 0, host: "localhost:40010" }]})
+# Shard 3
+mongo --port 40020
+rs.initiate({ _id: "rs2", members: [ { _id: 0, host: "localhost:40020" }]})
+# Start config server
+mongod --config configs/mongoc.conf.30010
+# Log to mongo shell of config server to set up replica set
+mongo --port 30010
+rs.initiate({ _id: "configsvr", configsvr: true, members: [ { _id: 0, host: "localhost:30010" }]})
+# Start mongos query router
+mongos --config configs/mongos.conf.50000
+# Log to mongo shell of config server to add shard to query router
+mongo --port 50000
+sh.addShard("rs0/localhost:40000")
+sh.addShard("rs1/localhost:40010")
+sh.addShard("rs2/localhost:40020")
+# Enable sharding for the database "deex"
+sh.enableSharding("deex")
+# Set up shard key for collection "epcis_events" of DB "deex", with range shard
+sh.shardCollection("deex.epcis_events", { "read_point" : 1, "event_time" : 1} )
+# Update settings
+use config
+# Set chunk size = 1MB
+db.settings.insertOne( { _id:"chunksize", value: 1 } )
+db.settings.update({ "_id" : "balancer"}, {"stopped" : true })
+db.settings.update({ "_id" : "autosplit"}, {"enabled" : true })
+db.settings.update({ "_id" : "chunksize"}, {"value" : 1 })
+# Note!!
+# import 1 ít dữ liệu --> bật balancer --> đợi nó chia ra mấy shards --> tắt balancer --> import dữ liệu chính
+
+
+

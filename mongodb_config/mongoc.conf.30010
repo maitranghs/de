@@ -1,0 +1,9 @@
+storage:
+  dbPath: /Users/trangbui/Documents/BK-Master-Degree/Coding/ws/mongodb_shard/data/mongoc.data.30010
+sharding:
+  clusterRole: configsvr
+replication:
+  replSetName: configsvr
+net:
+  bindIp: 127.0.0.1
+  port: 30010
